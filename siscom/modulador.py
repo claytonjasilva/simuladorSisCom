@@ -11,7 +11,8 @@ def sinalAM(modulante, Ta, fc, delta=1, A=1, dominioAM='t'):
     # A é amplitude da portadora, delta é coeficiente de modulação
     TN = len(modulante) * Ta # tempo de observação
     t = np.array([i * Ta for i in range(len(modulante))])
-    x = np.multiply((1 + delta * modulante), A * np.cos(2 * math.pi * fc * t))
+    #x = np.multiply((1 + delta * modulante), A * np.cos(2 * math.pi * fc * t))
+    x = A * np.cos(2 * math.pi * fc * t)
     Xf = np.absolute(np.fft.fft(x))
     f = np.fft.fftfreq(len(Xf), Ta)
 
