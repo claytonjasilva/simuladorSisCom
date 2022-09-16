@@ -7,82 +7,130 @@ import numpy as np
 import math
 
 
-def degrau(tamanho, Ta, amplitude=1, delay=0):
+def degrau(tamanho, Ta, amplitude=1.0, delay=0.0, dominio='t'):
     ret = int(delay / Ta)
     t = np.array([i * Ta for i in range(tamanho)])
     x = t * 0
     for i in range(ret, tamanho):  # x = 0, t<delay; x = A, t>= delay
         x[i] = amplitude
-    return t, x
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio=='t':
+        return t, x
+    else:
+        return f, Xf
 
 
-def porta(largura, tamanho, Ta, amplitude=1, delay=0):
+def porta(largura, tamanho, Ta, amplitude=1.0, delay=0.0, dominio='t'):
     ret = int(delay / Ta)
     t = np.array([i * Ta for i in range(tamanho)])
     L = int(largura / Ta)
     x = t * 0
     for i in range(ret, ret + L):  # x = 0, t<delay; x = t, t>= delay
         x[i] = amplitude
-    return t, x
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio=='t':
+        return t, x
+    else:
+        return f, Xf
 
 
-def rampa(tamanho, Ta, delay=0):
+def rampa(tamanho, Ta, delay=0.0, dominio='t'):
     ret = int(delay / Ta)
-    t = np.array([i * Ta - delay for i in range(tamanho)])
+    t = np.array([i * Ta for i in range(tamanho)])
     x = t * 0
     for i in range(ret, tamanho):  # x = 0, t<delay; x = t, t>= delay
-        x[i] = t[i]
-    return t, x
+        x[i] = t[i-ret]
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio=='t':
+        return t, x
+    else:
+        return f, Xf
 
 
-def impulso(tamanho, Ta, amplitude=1, delay=0):
+def impulso(tamanho, Ta, amplitude=1.0, delay=0.0, dominio='t'):
     ret = int(delay / Ta)
     t = np.array([i * Ta for i in range(tamanho)])
     x = t * 0
     x[ret] = amplitude
-    return t, x
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio == 't':
+        return t, x
+    else:
+        return f, Xf
 
 
-def serra(frequencia, tamanho, Ta, delay=0):
-    t = np.array([i * Ta - delay for i in range(tamanho)])
-    x = []
+def serra(tamanho, Ta, frequencia, amplitude = 1.0, delay=0.0, dominio ='t'):
+    t = np.array([i * Ta for i in range(tamanho)])
+    x = t * 0
     for i in range(tamanho):  # Utiliza série infinita de Fourier
         serie = 0
         for k in range(1, 100):
-            serie += (-1) ** k * math.sin(2 * math.pi * k * frequencia * t[i]) / k
-        x.append(2 / math.pi * serie)
-    return t, x
+            serie += (-1) ** k * math.sin(2 * math.pi * k * frequencia * (t[i] - delay)) / k
+        x[i] = 2 / math.pi * serie
+    x = amplitude * x / np.amax(x)
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio == 't':
+        return t, x
+    else:
+        return f, Xf
 
 
-def senoide(frequencia, tamanho, Ta, amplitude=1, delay=0):
-    t = np.array([i * Ta - delay for i in range(tamanho)])
-    x = amplitude * np.sin(2 * math.pi * frequencia * t)
-    return t, x
+def senoide(tamanho, Ta, frequencia, amplitude=1.0, delay=0.0, dominio='t'):
+    t = np.array([i * Ta for i in range(tamanho)])
+    x = amplitude * np.sin(2 * math.pi * frequencia * (t - delay))
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio == 't':
+        return t, x
+    else:
+        return f, Xf
 
 
-def triangular(frequencia, tamanho, Ta, delay=0):
-    t = np.array([i * Ta - delay for i in range(tamanho)])
-    x = []
+def triangular(tamanho, Ta, frequencia, amplitude=1.0, delay=0.0, dominio='t'):
+    t = np.array([i * Ta for i in range(tamanho)])
+    x = t * 0
     for i in range(tamanho):  # Utiliza série infinita de Fourier - wikipedia
         serie = 0
         for k in range(1, 100):
-            serie += math.sin(k * math.pi / 2) * math.sin(k * frequencia * t[i]) / k ** 2
-        x.append(8 / math.pi ** 2 * serie)
-    return t, x
+            serie += math.sin(k * math.pi / 2) * math.sin(k * frequencia * (t[i] - delay)) / k ** 2
+        x[i] = 8 / math.pi ** 2 * serie
+    x = x * amplitude / np.amax(x)
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio == 't':
+        return t, x
+    else:
+        return f, Xf
 
 
-def sinc(frequencia, tamanho, Ta, amplitude=1, delay=0):
-    t = np.array([i * Ta - delay for i in range(tamanho)])
-    x = amplitude * np.sinc(2 * math.pi * frequencia * t)
-    return t, x
+def sinc(tamanho, Ta, frequencia, amplitude=1.0, delay=0.0, dominio='t'):
+    t = np.array([i * Ta for i in range(tamanho)])
+    x = amplitude * np.sinc(2 * math.pi * frequencia * (t - delay))
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio == 't':
+        return t, x
+    else:
+        return f, Xf
 
 
-def quadrada(frequencia, tamanho, Ta, amplitude=1, delay=0):
-    t = np.array([i * Ta - delay for i in range(tamanho)])
-    x = []
+def quadrada(tamanho, Ta, frequencia, amplitude=1.0, delay=0.0, dominio='t'):
+    t = np.array([i * Ta for i in range(tamanho)])
+    x = t * 0
     for i in range(tamanho):  # Utiliza série infinita de Fourier - wikipedia
         serie = 0
         for k in range(1, 100):
-            serie += math.sin((2 * k - 1) * frequencia * t[i]) / (2 * k - 1)
-        x.append(4 * amplitude / math.pi * serie)
-    return t, x
+            serie += math.sin((2 * k - 1) * frequencia * (t[i]-delay)) / (2 * k - 1)
+        x[i] = 4 * amplitude / math.pi * serie
+    x = amplitude * x / np.amax(x)
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio == 't':
+        return t, x
+    else:
+        return f, Xf
