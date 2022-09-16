@@ -21,7 +21,8 @@ def captura(arquivo, dominioVoz='t'):
 
 def amostragem(sinal, Tasinal, Ta):
     Ns = len(sinal)
-    N = int(Ta / (Tasinal / (len(sinal) - 1)))  # Número de amostras do sinal em intervalo Ta
+    #N = int(Ta / (Tasinal / (len(sinal) - 1)))  # Número de amostras do sinal em intervalo Ta
+    N = int(Ta/Tasinal)
     delta = np.array([0.0] * Ns)
     for i in range(Ns):
         if (i % N) == 0:
