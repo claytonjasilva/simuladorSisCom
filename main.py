@@ -7,12 +7,10 @@ import siscom.codecvoz
 import siscom.modulador
 import numpy as np
 
-arquivo = 'C:/Users/Clayton J A Silva/PycharmProjects/simuladorSisCom/siscom/voz1_clayton.wav'
-a, b = siscom.codecvoz.captura(arquivo,dominioVoz='t')
-#t, x = siscom.codecvoz.amostragem(b, a, 0.03)
-#t = np.array([i * a for i in range(len(b))])
+# arquivo = 'C:/Users/Clayton J A Silva/PycharmProjects/simuladorSisCom/siscom/voz1_clayton.wav'
+# a, b = siscom.codecvoz.captura(arquivo,dominioVoz='t')
 
-f, X = siscom.modulador.sinalAM(b,a,100000,dominioAM='f')
+t, x = siscom.sinais.quadrada(10000,0.001, 50, amplitude=2.0, delay=2.8, dominio='f')
 
-plt.plot(f,X)
+plt.plot(t,x)
 plt.show()
