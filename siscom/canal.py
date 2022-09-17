@@ -7,30 +7,44 @@ import math
 import siscom.sinais
 
 
-def sin_ruido(sinal, Ta, SNR):
+def sinRuido(sinal, Ta, SNR, dominio='t'):
     t = np.array([i * Ta for i in range(len(sinal))])
     ampl_ruido = math.sqrt(np.dot(sinal, sinal) / 10 ** (SNR / 10))
     ruido = np.random.normal(loc=0, scale=ampl_ruido, size=len(sinal))
     x = sinal + ruido
-    return t, x
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio == 't':
+        return t, x
+    else:
+        return f, Xf
 
 
-def sin_interf(sinal, Ta, SINR, interferencia):
+def sinInterf(sinal, Ta, SINR, interferencia, dominio='t'):
     t = np.array([i * Ta for i in range(len(sinal))])
     ampl_interf = math.sqrt(np.dot(sinal, sinal) / 10 ** (SINR / 10))
-    interferencia_tempo = ampl_interf * np.fft.ifft(interferencia) / np.linalg.norm(interferencia)
+    print(np.linalg.norm(interferencia))
+    interferencia_tempo = ampl_interf * np.fft.ifft(interferencia)
     x = sinal + interferencia_tempo
+    Xf = np.absolute(np.fft.fft(x))
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio == 't':
+        return t, x
+    else:
+        return f, Xf
 
-    return t, x
 
-
-def sin_ganho(sinal, Ta, Gf):
+def sinGanho(sinal, Ta, Hf, dominio='t'):
+    sinalf = np.fft.fft(sinal)
+    Yf = np.multiply(sinalf, Hf)
+    Xf = np.absolute(Yf)
+    x = np.fft.ifft(Yf)
     t = np.array([i * Ta for i in range(len(sinal))])
-    Xf = np.fft.fft(sinal)
-    Yf = np.dot(Xf, Gf)
-    y = np.fft.ifft(Y)
-
-    return t, y
+    f = np.fft.fftfreq(len(Xf), Ta)
+    if dominio == 't':
+        return t, x
+    else:
+        return f, Xf
 
 
 def capacidade(sinal, ruido, Bw):
