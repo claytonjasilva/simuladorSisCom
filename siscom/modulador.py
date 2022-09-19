@@ -5,22 +5,18 @@
 import math
 import numpy as np
 
-def sinalAM(modulante, Ta, fc, delta=1, A=1, dominioAM='t'):
-    # O simulador representa um sinal modulante modulado em amplitude por uma onda portadora
-    # Simula também o comportamento espectral do sinal resultante
-    # A é amplitude da portadora, delta é coeficiente de modulação
-    TN = len(modulante) * Ta # tempo de observação
+def sinalAM(modulante, fc, A=1, delta=1, dominio='t'):
+    Ta = 1 / (20 * fc)
     t = np.array([i * Ta for i in range(len(modulante))])
-    #x = np.multiply((1 + delta * modulante), A * np.cos(2 * math.pi * fc * t))
-    x = A * np.cos(2 * math.pi * fc * t)
+    portadora = A * np.cos(2 * math.pi * fc * t)
+    x = np.multiply((1 + delta * modulante), portadora)
     Xf = np.absolute(np.fft.fft(x))
     f = np.fft.fftfreq(len(Xf), Ta)
-
-    if dominioAM =='t':
+    if dominio =='t':
         return t, x
     else:
         return f, Xf
-
+    return f, Xf
 
 def sinalSSB(modulante, Ta, fc, delta=1, A=1):
     # O simulador representa um sinal senoidal modulado em SSB por uma onda portadora
