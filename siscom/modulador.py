@@ -134,6 +134,13 @@ def geraSinalPSK(simbolosPSK, fc, dominio='t'):
 
     return f, Xf
 
+def geraConstelacao(sinal):
+    yf = np.fft.fft(sinal, norm="ortho")
+    magnitude = np.abs(yf)
+    phase = np.angle(yf)
+
+    return magnitude, phase
+
 def geraSinalQAM(simbolosQAM, fc, dominio='t'):
     s = []
     M = 16
